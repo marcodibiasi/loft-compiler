@@ -1,0 +1,27 @@
+section sounds:
+    sound kick = synth(SINE);
+    par k_envelope = [0, 0.1, 0.1, 0.2];
+    kick.envelope = k_envelope;
+
+    sound snare = synth(SINE);
+    snare.envelope = [0, 0.1, 0.3, 0.2];
+
+section tracks: 
+    track drums = sequence(bpm);
+
+    drums.add(kick);
+    drums.add(snare);
+
+    pattern kick_patter = |xooo|xooo|;
+
+    drums.kick > kick_pattern;
+    drums.snare > |ooxo|ooxo|;
+
+section play:
+    par bpm = 170;
+    track song = layers(4);
+
+    song(0) = drums;
+    
+    >> song
+
