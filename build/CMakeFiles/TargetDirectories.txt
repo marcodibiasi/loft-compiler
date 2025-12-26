@@ -1,3 +1,0 @@
-/home/caroline/Desktop/Projects/Loft/build/CMakeFiles/loft.dir
-/home/caroline/Desktop/Projects/Loft/build/CMakeFiles/edit_cache.dir
-/home/caroline/Desktop/Projects/Loft/build/CMakeFiles/rebuild_cache.dir
