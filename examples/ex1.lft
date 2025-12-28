@@ -1,15 +1,19 @@
-section sounds @drums_sound:
-    sound kick = synth(SINE)
+module SYNTH
+module SEQUENCE
+module LAYERS
+
+section sounds @drums_sounds:
+    sound kick = SINTH(SINE) 
     par k_envelope = [0, 0.1, 0.1, 0.2]
     kick.envelope = k_envelope
 
-    sound snare = synth(SINE)
-    snare.envelope = [0 0.1, 0.3, 0.2]
+    sound snare = SYNTH(SINE)
+    snare.envelope = [0, 0.1, 0.3, 0.2]
 
 section tracks @drums_tracks: 
     using @drums_sounds
     
-    track drums = sequence(bpm)
+    track drums = SEQUENCE(8)
 
     drums:add(kick)
     drums:add(snare)
@@ -19,13 +23,11 @@ section tracks @drums_tracks:
     drums.kick > kick_pattern
     drums.snare > |ooxo|ooxo|
 
-section play:
+section play :
     using @drum_tracks
-    par bpm = 170
 
-    track song = layers(4)
-
-    song(0) = drums
+    track song = LAYERS(4)
+    song[0] = drums
     
-    >> song
+    >> song !170 
 

@@ -69,6 +69,9 @@ Token Lexer::next_token(){
         case '.': 
             advance();        
             return Token{TokenType::DOT, ".", line};
+        case '!': 
+            advance();        
+            return Token{TokenType::EXCLAMATION, "!", line};
         case ',': 
             advance();        
             return Token{TokenType::COMMA, ",", line};
@@ -91,6 +94,7 @@ Token Lexer::read_identifier_or_keyword(){
     if(word == "track") return Token{TokenType::TRACK, word, line};
     if(word == "par") return Token{TokenType::PAR, word, line};
     if(word == "section") return Token{TokenType::SECTION, word, line};
+    if(word == "module") return Token{TokenType::MODULE, word, line};
     if(word == "using") return Token{TokenType::USING, word, line};
 
     // IDENTIFIERS

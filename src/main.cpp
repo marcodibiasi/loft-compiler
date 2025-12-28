@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "ast.h"
 #include "lexer.h"
+#include "parser.h"
 
 std::string file_to_string(const std::string& filename);
 
@@ -16,7 +17,7 @@ int main(int argc, char** argv){
     
     std::string source = file_to_string(argv[1]);
     Lexer lexer(source);
-
+    
     while(!lexer.is_at_end()) {
         Token tok = lexer.next_token();
         std::cout   << "Token: " << static_cast<int>(tok.type) << " - "
@@ -24,6 +25,7 @@ int main(int argc, char** argv){
                     << "Line: " << tok.line 
                     << std::endl;
     }
+    
 
     return EXIT_SUCCESS;
 }

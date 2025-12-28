@@ -1,139 +1,82 @@
 #pragma once
+#include <ostream>
 #include <string>
 #include <vector>
 #include <array>
 #include <map>
+#include <memory>
 
 using namespace std;
 
-// DATA TYPES
+struct ModuleImport;
+struct Section;
+struct Stmt;
+struct Decl;
+struct Expr;
+struct SoundDecl;
+struct TrackDecl;
+struct ParDecl;
+struct PatternDecl;
 
-/*
-> Sound: stores the design of a sound. 
-It is declared as: 
-sound name;
-*/
-class Sound {    
-private:
+
+// MAIN NODE
+struct ASTNode {
+    virtual ~ASTNode() = default;
+};
+
+
+// PROGRAM NODE
+struct Program : public ASTNode {
+    vector<unique_ptr<ModuleImport>> modules;  
+    vector<unique_ptr<Section>> sections;
+};
+
+
+// MODULE IMPORT
+struct ModuleImport : public ASTNode {
     string name;
-    string waveform; 
-    array<float, 4> envelope;
-
-public:
-    Sound(const string& n) : name(n) {}
-
-    void set_waveform(const string& w) {waveform = w;}
-    void set_envelope(const array<float, 4>& env) {envelope = env;}
-    const string& get_name() const {return name;}
-    const string& get_waveform() const {return waveform;}
-    const array<float, 4>& get_envelope() const {return envelope;}
 };
 
 
-/*
-> Pattern: stores a pattern (time- and sound-independent). 
-The format is |xooo|xooo| where: x = play, o = pause.
-It is declared as: 
-pattern name; 
-*/
-class Pattern {
-private:
+// SECTIONS
+struct Section : public ASTNode {
     string name;
-    string sequence; 
-    
-public:
-    Pattern(const string& n) : name(n) {}
-
-    void set_sequence(const string& seq) {sequence = seq;}
-    const string& get_name() const {return name;}
-    const string& get_sequence() const {return sequence;}
+    //vector<unique_ptr<Stmt>> statements;
+    // vector<unique_ptr<Decl>> declarations;
+    // vector<unique_ptr<Expr>> expressions;
+    vector<string> used_sections;
 };
 
-
-/*
-Track: pairs sound and pattern, stores the tempo and can be played.
-It is declared as: 
-track name;
-*/
-class Track {
-private: 
-    string name;
-    float bpm;
-    vector<Sound*> sounds;
-    map<Sound*, Pattern> patterns;
-
-public:
-    Track(const string& n) : name(n) {}
-
-    void set_bpm(float bpm) {this->bpm = bpm;}
-    void add_sound(Sound* s) {sounds.push_back(s);}
-    void assign_pattern(Sound* s, const Pattern& p);
-    const string& get_name() const {return name;}
-    float get_bpm() const {return bpm;}
+struct SoundsSection : public Section {
+    vector<SoundDecl> sounds;    
 };
 
-/*
-Par: is a parameter. It is represented by a float32.
-It is declared as: 
-par name; 
-*/
-class Par {
-private:
-    string name; 
-    float value; 
-
-public:
-    Par(const string& n) : name(n) {}
-
-    void set_value(float v) {value = v;}
-    float get_value() const {return value;}
+struct TrackSection : public Section {
+    vector<TrackDecl> tracks;
 };
 
-
-// PROGRAM COMPONENTS
-
-/*
-A section is a defined function with a fixed name 
-and no passing values
-*/
-class Section {
-private:
-    string name; 
-
-public:
-    Section(const string& n) : name(n) {}
-
-    const string& get_name() const {return name;}
-    virtual ~Section() = default;
-};
+struct PlaySection : public Section {
+    PlaySection() {name = "play";} 
+}; // Entry point
 
 
-class SoundsSection : public Section {
-private:
-    vector<Sound*> sounds;
-
-public:
-    SoundsSection(const string& n) : Section(n) {}
-
-    void add_sound(Sound* s) {sounds.push_back(s);}
-};
-
-
-class TracksSection : public Section {
-private: 
-    vector<Track*> tracks;
-
-public:
-    TracksSection(const string& n) : Section(n) {}
-    
-    void add_track(Track* t) {tracks.push_back(t);}
-};
-
-
-/*
-Play section is the entry point, therefore must be unique
-*/
-class PlaySection : public Section {
-public:
-    PlaySection() : Section("play") {}
-};
+// TODO:
+// define all the statements 
+//  assign expression   obj.var = expression 
+//  assign pattern      obj.var > pattern
+//  run                 obj:func(value)
+//  play track          >> track !value
+//
+// define all the declarations
+//  declare sound       sound name = module_expression 
+//  declare track       track name = module_expression
+//  declare par         par name = expression 
+//  declare pattern     pattern name = pattern
+//
+// define all the expressions
+//  module call         module(expression)
+//  pattern             |####|####|
+//  variable            * / name
+//  array               [*, *]
+//  module component    module[*]
+//  access array        name[*]

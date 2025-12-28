@@ -7,6 +7,7 @@ enum class TokenType {
     TRACK,
     PAR, 
     SECTION,
+    MODULE,
     USING,
 
     // SYMBOLS
@@ -20,6 +21,7 @@ enum class TokenType {
     DOT,            // .
     COMMA,          // ,
     PIPE,           // |
+    EXCLAMATION,    // !
     ASSIGN_PATTERN, // >
     PLAY,           // >>
 
