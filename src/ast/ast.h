@@ -10,9 +10,11 @@ using namespace std;
 
 struct ModuleImport;
 struct Section;
-struct Stmt;
-struct Decl;
-struct Expr;
+struct Statement;
+struct Declaration;
+struct Expression;
+struct PatternExpr;
+struct ModuleExpr;
 struct SoundDecl;
 struct TrackDecl;
 struct ParDecl;
@@ -41,9 +43,9 @@ struct ModuleImport : public ASTNode {
 // SECTIONS
 struct Section : public ASTNode {
     string name;
-    //vector<unique_ptr<Stmt>> statements;
-    // vector<unique_ptr<Decl>> declarations;
-    // vector<unique_ptr<Expr>> expressions;
+    vector<unique_ptr<Statement>> statements;
+    vector<unique_ptr<Declaration>> declarations;
+    vector<unique_ptr<Expression>> expressions;
     vector<string> used_sections;
 };
 
@@ -60,23 +62,100 @@ struct PlaySection : public Section {
 }; // Entry point
 
 
-// TODO:
-// define all the statements 
-//  assign expression   obj.var = expression 
-//  assign pattern      obj.var > pattern
-//  run                 obj:func(value)
-//  play track          >> track !value
+// Statements
+struct Statement : public ASTNode {};
+
+struct AssignExpression : public Statement {
+    string obj;
+    string var; 
+    unique_ptr<Expression> expr;
+};
+
+struct AssignPattern : public Statement {
+    string obj;
+    string var; 
+    unique_ptr<PatternExpr> expr;
+};
+
+struct RunFunction : public Statement {
+    string obj;
+    string func;
+    string value;
+}; 
+
+struct PlayTrack : public Statement {
+    string track;
+    int bpm; 
+};
+
+
+// Declarations
+struct Declaration : public ASTNode {
+    string name;
+};
+
+struct DeclSound : public Declaration {
+    unique_ptr<ModuleExpr> expr;
+};
+
+struct DeclTrack : public Declaration {
+    unique_ptr<ModuleExpr> expr;
+};
+
+struct DeclPar : public Declaration {
+    unique_ptr<Expression> expr;
+};
+
+struct DeclPattern : public Declaration {
+    unique_ptr<PatternExpr> expr;
+};
+
+
+// Expressions 
+struct Expression : public ASTNode {
+    string name; //can be empty
+};
+
+struct PatternExpr : public Expression {
+    string pattern;
+};
+
+struct ModuleExpr : public Expression {
+    string module;
+    unique_ptr<Expression> expr;
+};
+
+struct VariableExpr : public Expression {
+    float value; 
+};
+
+struct ArrayExpr : public Expression {
+    vector<float> vec;
+};
+
+struct AccessComponent : public Expression {
+    int index;
+};
+
+
+
+// STATEMENTS 
+//  assign expression           obj.var = expression 
+//  assign pattern              obj.var > pattern
+//  run                         obj:func(value)
+//  play track                  >> track !value
 //
-// define all the declarations
-//  declare sound       sound name = module_expression 
-//  declare track       track name = module_expression
-//  declare par         par name = expression 
-//  declare pattern     pattern name = pattern
 //
-// define all the expressions
-//  module call         module(expression)
-//  pattern             |####|####|
-//  variable            * / name
-//  array               [*, *]
-//  module component    module[*]
-//  access array        name[*]
+// DECLARATIONS
+//  declare sound               sound name = module_expression 
+//  declare track               track name = module_expression
+//  declare par                 par name = expression 
+//  declare pattern             pattern name = pattern
+//
+// 
+// EXPRESSIONS
+//  module call                 module(expression)
+//  pattern                     |####|####|
+//  variable                    * 
+//  array                       [*, *]
+//  module / array component    module[*] / array[*]
